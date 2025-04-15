@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2020",                        // Versão de JS gerado
     "module": "CommonJS",                      // Sistema de módulos do Node
-    "rootDir": "src",                          // Onde estão os arquivos .ts
+    "rootDir": "./",                          // Onde estão os arquivos .ts
     "outDir": "dist",                          // Onde o código JS compilado vai ficar
     "strict": true,                            // Ativa checagens rigorosas
     "esModuleInterop": true,                   // Suporta importações ES6
