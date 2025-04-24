@@ -7,11 +7,105 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model User {
-  id        Int      @id @default(autoincrement()) // ID do usuário
-  nome      String   // Nome do usuário
-  email     String   @unique // Email único
-  senha     String   // Senha (recomenda-se usar criptografia)
-  criadoEm  DateTime @default(now()) // Data de criação
-  atualizadoEm DateTime @updatedAt // Data de última atualização
+generator erd {
+  provider = "prisma-erd-generator"
+  output   = "./ERD.svg"
+}
+
+model Usuario {
+  id                 Int                 @id @default(autoincrement())
+  nome               String
+  email              String              @unique
+  senha              String
+  fotoUrl            String?
+  status             Boolean             @default(true) // ativo = true
+  criadoEm           DateTime            @default(now())
+  ultimoLogin        DateTime?
+
+  // Relacionamentos
+  listas             ListaCompra[]
+  receitasFinanceiras Receita[]
+  despesas           Despesa[]
+  receitasCulinarias ReceitaCulinaria[]
+}
+
+model ListaCompra {
+  id             Int         @id @default(autoincrement())
+  nome           String
+  categoria      String
+  usuarioId      Int         // FK para Usuario
+  criadoEm       DateTime    @default(now())
+
+  // Relacionamento com o usuário
+  usuario        Usuario    @relation(fields: [usuarioId], references: [id])
+
+  // Relacionamento com produtos na lista
+  itens           ItemLista[]
+}
+model ItemLista {
+  id             Int         @id @default(autoincrement())
+  listaCompraId  Int         // FK para ListaCompra
+  produtoId      Int         // FK para Produto
+  quantidade     Int
+
+  // Relacionamento com ListaCompra e Produto
+  listaCompra    ListaCompra @relation(fields: [listaCompraId], references: [id])
+  produto        Produto     @relation(fields: [produtoId], references: [id])
+}
+model Produto {
+  id            Int        @id @default(autoincrement())
+  nome          String
+  descricao     String
+  categoria     String
+  codigoBarras  String     @unique
+  fotoUrl       String?
+  criadoEm      DateTime   @default(now())
+  atualizadoEm  DateTime   @updatedAt
+
+  // Relacionamento com o estoque
+  estoque       Estoque[]
+
+  // Relacionamento com os itens de listas de compras
+  itensLista    ItemLista[]
+}
+model Estoque {
+  id         Int     @id @default(autoincrement())
+  produtoId  Int     // FK para Produto
+  quantidade Int
+
+  // Relacionamento com Produto
+  produto    Produto @relation(fields: [produtoId], references: [id])
+}
+model Receita {
+  id          Int       @id @default(autoincrement())
+  descricao   String
+  valor       Float
+  data        DateTime  @default(now())
+  categoria   String
+  usuarioId   Int       // FK para Usuario
+
+  // Relacionamento com o usuário
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id])
+}
+model Despesa {
+  id          Int       @id @default(autoincrement())
+  descricao   String
+  valor       Float
+  data        DateTime  @default(now())
+  categoria   String
+  pago        Boolean   @default(false)
+  usuarioId   Int       // FK para Usuario
+
+  // Relacionamento com o usuário
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id])
+}
+model ReceitaCulinaria {
+  id          Int       @id @default(autoincrement())
+  nome        String
+  descricao   String
+  usuarioId   Int       // FK para Usuario
+  criadoEm    DateTime  @default(now())
+
+  // Relacionamento com o usuário
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id])
 }
