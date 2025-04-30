@@ -16,7 +16,7 @@ const HOST = process.env.DB_HOST || '192.168.163.41';
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 app.use('/docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swagger_1.default));
-app.use('/usuarios', user_route_1.default);
+app.use('/users', user_route_1.default);
 app.listen(PORT, '192.168.163.41', () => {
     console.log(`✅ Servidor rodando na porta ${PORT}`);
 });

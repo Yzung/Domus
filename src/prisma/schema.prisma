@@ -1,17 +1,224 @@
-datasource db {
-  provider = "sqlite"
-   url     = env("DATABASE_URL")
-}
-
 generator client {
   provider = "prisma-client-js"
 }
 
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL") // Defina sua string de conexão no .env
+}
+
+// ---------------------------
+// Tabela User (usuário do sistema)
+// ---------------------------
 model User {
-  id        Int      @id @default(autoincrement()) // ID do usuário
-  nome      String   // Nome do usuário
-  email     String   @unique // Email único
-  senha     String   // Senha (recomenda-se usar criptografia)
-  criadoEm  DateTime @default(now()) // Data de criação
-  atualizadoEm DateTime @updatedAt // Data de última atualização
+  user_id    BigInt @id @default(autoincrement())
+  user_nome  String
+  user_senha String
+
+  // Relacionamentos
+  email      Email[]
+  telefone   Telefone[]
+  ePessoal   EPessoal[]
+  eComercial EComercial[]
+  entradas   Entrada[]
+  saidas     Saida[]
+  receitas   Receita[]
+  compras    Compra[]
+  estoque    Estoque[]
+}
+
+// ---------------------------
+// Tabela Categoria (tipo de produto)
+// ---------------------------
+model Categoria {
+  cat_id        Int     @id @default(autoincrement())
+  cat_nome      String
+  cat_descricao String?
+
+  produtos Produto[]
+  Estoque  Estoque[]
+}
+
+// ---------------------------
+// Tabela Lote (identificação e validade de produto)
+// ---------------------------
+model Lote {
+  lote_id         Int       @id @default(autoincrement())
+  lote_nome       String
+  lote_validade   String
+  lote_quantidade Int
+  produtos        Produto[]
+  Estoque         Estoque[]
+}
+
+// ---------------------------
+// Tabela Produto (item comprado/gerenciado)
+// ---------------------------
+model Produto {
+  prod_id         Int       @id @default(autoincrement())
+  prod_nome       String
+  prod_descricao  String?
+  prod_valor      BigInt
+  prod_datacriado DateTime
+  prod_uso        Boolean // Produto possui 2 tipos de uso: 1 para uso contínuo e 0 descartável
+  prod_foto       String? // URL da foto do produto
+  data_compra     DateTime? // Data da compra do produto (opcional)
+
+  categoria_cat_id Int
+  lote_lote_id     Int
+
+  categoria Categoria @relation(fields: [categoria_cat_id], references: [cat_id])
+  lote      Lote      @relation(fields: [lote_lote_id], references: [lote_id])
+
+  estoques Estoque[]
+  compras  Compra[]
+}
+
+// ---------------------------
+// Tabela Lista (gerenciamento de compras)
+// ---------------------------
+model Lista {
+  lista_id         Int      @id @default(autoincrement())
+  lista_nome       String
+  lista_descricao  String?
+  lista_valor      BigInt
+  lista_fim        Boolean
+  lista_datacriada DateTime
+
+  compras Compra[]
+}
+
+// ---------------------------
+// Tabela Compra (ligação entre lista, produto e usuário)
+// ---------------------------
+model Compra {
+  lista_lista_id  Int
+  produto_prod_id Int
+  user_user_id    BigInt
+
+  lista   Lista   @relation(fields: [lista_lista_id], references: [lista_id])
+  produto Produto @relation(fields: [produto_prod_id], references: [prod_id])
+  user    User    @relation(fields: [user_user_id], references: [user_id])
+
+  // Chave composta
+  @@id([lista_lista_id, produto_prod_id, user_user_id])
+}
+
+// ---------------------------
+// Tabela Estoque (quantidade, validade, etc)
+// ---------------------------
+model Estoque {
+  est_id                   Int    @id @default(autoincrement())
+  produto_prod_id          Int
+  produto_categoria_cat_id Int
+  produto_lote_lote_id     Int
+  user_user_id             BigInt
+
+  // Chave composta referenciando Produto
+  produto   Produto   @relation(fields: [produto_prod_id], references: [prod_id])
+  categoria Categoria @relation(fields: [produto_categoria_cat_id], references: [cat_id])
+  lote      Lote      @relation(fields: [produto_lote_lote_id], references: [lote_id])
+  user      User      @relation(fields: [user_user_id], references: [user_id])
+}
+
+// ---------------------------
+// Tabela Email
+// ---------------------------
+model Email {
+  email_id     Int    @id @default(autoincrement())
+  email_email  String
+  user_user_id BigInt
+
+  user User @relation(fields: [user_user_id], references: [user_id])
+
+  @@unique([email_email, user_user_id]) // Certificando que o e-mail é único por usuário
+}
+
+// ---------------------------
+// Tabela Telefone
+// ---------------------------
+model Telefone {
+  tel_id       Int    @id @default(autoincrement())
+  tel_numero   String
+  tel_ddd      Int
+  user_user_id BigInt
+
+  user User @relation(fields: [user_user_id], references: [user_id])
+
+  @@unique([tel_numero, user_user_id]) // Certificando que o telefone é único por usuário
+}
+
+// ---------------------------
+// Tabela Endereço Pessoal
+// ---------------------------
+model EPessoal {
+  ep_id        Int    @id @default(autoincrement())
+  ep_rua       String
+  ep_numero    String
+  ep_bairro    String
+  ep_cidade    String
+  user_user_id BigInt
+
+  user User @relation(fields: [user_user_id], references: [user_id])
+
+  @@unique([ep_rua, ep_numero, ep_bairro, ep_cidade, user_user_id]) // Garantindo que o endereço seja único por usuário
+}
+
+// ---------------------------
+// Tabela Endereço Comercial
+// ---------------------------
+model EComercial {
+  ec_id        BigInt @id @default(autoincrement())
+  ec_rua       String
+  ec_numero    BigInt
+  ec_bairro    String
+  ec_cidade    String
+  user_user_id BigInt
+
+  user User @relation(fields: [user_user_id], references: [user_id])
+
+  @@unique([ec_rua, ec_numero, ec_bairro, ec_cidade, user_user_id]) // Garantindo que o endereço seja único por usuário
+}
+
+// ---------------------------
+// Tabela Entradas (transações ou registros de entrada de itens ou valores)
+// ---------------------------
+model Entrada {
+  ent_id       Int      @id @default(autoincrement())
+  ent_nome     String
+  ent_rec      Boolean
+  ent_data     DateTime
+  user_user_id BigInt
+
+  user User @relation(fields: [user_user_id], references: [user_id])
+
+  @@unique([ent_nome, user_user_id]) // Garantindo que a entrada seja única por nome e usuário
+}
+
+// ---------------------------
+// Tabela Saídas (transações de saída de valores)
+// ---------------------------
+model Saida {
+  sai_id       Int      @id @default(autoincrement())
+  sai_nome     String
+  sai_rec      Boolean
+  sai_data     DateTime
+  user_user_id BigInt
+
+  user User @relation(fields: [user_user_id], references: [user_id])
+
+  @@unique([sai_nome, user_user_id]) // Garantindo que a saída seja única por nome e usuário
+}
+
+// ---------------------------
+// Tabela Receitas (relacionadas a receitas culinárias?)
+// ---------------------------
+model Receita {
+  rec_id        Int      @id @default(autoincrement())
+  rec_nome      String   @unique
+  rec_tentativa DateTime
+  rec_nota      String?
+  user_user_id  BigInt
+
+  user User @relation(fields: [user_user_id], references: [user_id])
 }
