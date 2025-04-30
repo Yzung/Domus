@@ -1,12 +1,10 @@
 import express from 'express';
-const userRouter = require('./modules/routes/user_route');
+
 
 const app = express();
-app.use(express.json()); // necessário para o req.body funcionar
+const PORT = 3000;
+
+app.use(express.json());
 
 
-app.use('/api', userRouter);
-
-app.listen(3000, () => {
-  console.log('Servidor rodando na porta 3000');
-});
+app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
