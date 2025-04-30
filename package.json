@@ -3,6 +3,12 @@
   "version": "1.0.0",
   "description": "Gestão doméstica e pessoal",
   "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "nodemon ./src/server.ts",
+    "build": "tsc",
+    "generate": "npx prisma generate"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Yzung/Domus.git"
@@ -10,34 +16,32 @@
   "keywords": [],
   "author": "Yzung",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/Yzung/Domus/issues"
   },
   "homepage": "https://github.com/Yzung/Domus#readme",
+  "dependencies": {
+    "@prisma/client": "^6.7.0",
+    "express": "^5.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "mongodb": "^6.16.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "yamljs": "^0.3.0"
+  },
   "devDependencies": {
+    "@mermaid-js/mermaid-cli": "^11.4.2",
     "@types/cors": "^2.8.17",
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.1",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
-    "cors": "^2.8.5",
-    "dotenv": "^16.5.0",
-    "express": "^5.1.0",
     "nodemon": "^3.1.9",
     "prisma": "^6.7.0",
+    "prisma-erd-generator": "^2.0.4",
+    "puppeteer": "^23.11.1",
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon ./src/server.ts",
-    "build": "tsc"
-  },
-  "dependencies": {
-    "@prisma/client": "^6.7.0",
-    "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1",
-    "yamljs": "^0.3.0"
   }
 }

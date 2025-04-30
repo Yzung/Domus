@@ -9,6 +9,6 @@
     "forceConsistentCasingInFileNames": true,  // Evita problemas com case-sensitive
     "skipLibCheck": true                       // Ignora a checagem de tipos das bibliotecas
   },
-  "include": ["src", "src/server.ts"],         // Inclui o diretório de código
+  "include": ["src", "src/server.ts", "prisma"],         // Inclui o diretório de código
   "exclude": ["node_modules"]                  // Exclui o diretório node_modules
 }
